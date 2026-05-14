@@ -1387,11 +1387,16 @@
           timestamp:    row.timestamp,
           dept:         row.dept || null,
           leadIns:      Object.fromEntries(
-            (row.li || []).map((text, i) => [i + 1, {
-              text,
-              sentiment:       (row.sent || [])[i] || null,
-              sentimentSource: 'algorithm'
-            }])
+            (row.li || []).map((text, i) => {
+              const scored = text ? scoreSentiment(text) : { sentiment: 'neutral', score: 0, hits: [] };
+              return [i + 1, {
+                text,
+                sentiment:       scored.sentiment,
+                sentimentScore:  scored.score,
+                sentimentHits:   scored.hits,
+                sentimentSource: 'algorithm'
+              }];
+            })
           ),
           ratings: {
             serve:          row.ratings?.serve          || null,
